@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+//원래는 submit이 눌러졌을 때 폼 액션이 설정되어있는 곳으로 넘어가야 하는데 넘어가지않게 코딩 해보기
+	$(function(){
+		$("#my_form").submit(function(event){	//submit이 눌리면!
+			
+			var member = $("my_form").serializeArray();
+			var str = $.param(member);
+			console.log(str);
+			var url = "/ActionWithData?" + str
+			
+			$("#wrap").load(url);
+			
+			/*
+			$.ajax("/ActionWithData",{data:member, success:function(r){
+				$("#wrap").html(r);
+			}})
+			*/
+		
+		
+			//서버로 가지마!
+			event.preventDefault(); //기본 이벤트를 금지,제거하는 메소드
+			
+			
+		})
+	})
+	
+
+</script>
+</head>
+<body>
+	<form id="my_form" action="login.do" method="post" >
+		<table>
+			<tr>
+				<td><label for="name">Name</label></td><!-- 라벨은 name을 위한 설명 -->
+				<td><input type="text" id="name" name="name"></td>
+				<!-- id를 주는 것은 스크립트에서 제어하려고, name은 서버에 보내주기 위해서 -->
+			</tr>
+			
+			<tr>
+				<td><label for="age">Age</label></td><!-- 라벨은 name을 위한 설명 -->
+				<td><input type="text" id="age" name="age"></td>
+				<!-- id를 주는 것은 스크립트에서 제어하려고, name은 서버에 보내주기 위해서 -->
+			</tr>
+		</table>
+		<input type="submit" value="Get Ajax String">
+	</form>
+	
+	<div id="wrap"></div>
+</body>
+</html>

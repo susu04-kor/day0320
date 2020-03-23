@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		//내 글 등록하기
+		$("#write").click(function(){
+			var chat = $("#f").serialize();
+			$.ajax("chatInsert", {data:chat, success:function(){
+				
+			}})
+		})
+		
+		//다른 사람의 대화 목록을 읽어오는 것 (Reverse Ajax - 내가 등록하는 단추를 안 눌렀는데도 계속 값을 갖고오는 것)
+		setInterval(  function(){
+			//계속 돌아가니까 이전에 가져온 데이터는 지울 수 있도록
+			$("#list").empty();
+			var today = new Date();
+			$.getJSON("chatList?a="+today, function(data){//이거 계속 다른 요청이야 라는 걸 알려주기 위해서 오늘날짜를 뿌려주는 것
+				$.each(data,function(idx, chat){
+					$("#list").append(  $("<p></p>").text("["+chat.name+"]"+chat.message)  );
+				})
+			});
+		}, 1000 );
+		
+		
+	})
+
+</script>
+</head>
+<body>
+	<h2>이야기 해 봐요</h2>
+	<form id="f">
+		<p>
+			<label for="name">닉네임</label><!-- label은 네임은 없고 그 대신 for가 있음 - 누구(input name)를 위한 건지 알려주는 것 -->
+			<input type="text" id="name" name="name">
+		</p>
+		<p>
+			<label for="message">메세지</label>
+			<textarea rows="5" cols="60" id="message" name="message"></textarea>
+		</p>
+	</form>
+	<button id="write">글쓰기</button>
+	<hr>
+	<div id="list"></div>
+</body>
+</html>

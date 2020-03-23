@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<style type="text/css">
+
+*{
+	margin: 0px;
+	padding: 0px;
+}
+
+#wrap{
+	overflow: hidden;
+}
+.item{
+	margin: 5px;
+	padding: 5px;
+	width: 300px;
+	height: 150px;
+	float: left;
+	
+	border: 3px solid gray;
+	border-radius: 20px;
+}
+
+ul{
+	overflow.hidden;
+}
+
+li{
+	float: left;
+	list-style: none;
+	padding: 10px;
+	cursor: pointer;
+}
+
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		
+		/*
+		function getItems(nowPage, itemsPerPage){	
+		}
+		*/
+		var arr;
+		var totalRecord=0;	//전체 레코드 수
+		var totalPage=1;	//1000이라고 설정해도 되고 초기화 값은 상관이 없음
+		var pageSIZE=6;
+		
+		//페이지번호 출력하는 함수를 이 안에 넣을 것
+		function printPage(){
+			//페이지 번호 출력
+			for(var i=1;i<totalPage;i++){
+				var li = $("<li></li>").html(i);
+				$(li).click(function(){
+					var pageNum = Number($(this).text());
+					printGoods(pageNum);
+				})
+					$(".paging_button").append(li);
+						//이미 띄워져있는 그림 위에 또 뜨게 하니까 id가 wrap인 걸 지워야 함
+			}
+		}
+		
+		//현재페이지에 따라서 상품출력하는 기능 만들기
+		function printGoods(pageNum){
+			//상품출력
+			$("#wrap").empty();
+			var start = (pageNum-1) * pageSIZE + 1;
+			var end = start + pageSIZE-1;
+			if(end > totalRecord){	//arr.length이라고 해도 됨
+				end = totalRecord;
+			}
+			
+			for(var i=start; i<=end; i++){	//시작레코드가 0이면 0부터 뽑아와야 하니까 -1해주기
+				var g = arr[i-1];
+			//$.each(arr, function(idx, g){
+				var div = $("<div></div>").addClass("item");
+				var item = $("<h5></h5>").html(g.item);
+				var img = $("<img></img>").attr({src: "img/"+g.fname, width:50, height:50});	//attr 속성 추가
+				var qty = $("<p></p>").html(g.qty);
+				var price = $("<p></p>").html(g.price);
+				var detail = $("<p></p>").html(g.detail);
+				
+				$(div).append(item, img, qty, price, detail);
+				$("#wrap").append(div);
+			//})
+			}
+		}
+		
+		$.getJSON("goodsList", function(data){
+			arr = data;
+			//alert(arr);
+			
+			totalRecord=arr.length;
+			totalPage = Math.ceil(totalRecord/pageSIZE);
+			
+			//응답이 와야 토탈레코드등이 동작하니까 최초의 실행을 위해선 여기에 메소드가 위치하는 게 맞다
+			 printPage();
+			 printGoods(1);	//맨 처음에 1페이지 보여주기
+		})
+
+	})
+	
+</script>
+</head>
+<body>
+	<ul class="paging_button"></ul>
+	<div id="wrap"></div>
+	<ul class="paging_button"></ul>
+	
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<link rel="stylesheet" href="jquery-ui-1.12.1/jquery-ui.min.css">
+<style type="text/css">
+
+	*{
+		margin: 0px;
+		padding: 0px;
+	}
+	
+	body{
+		font: 62.5%
+	}
+	
+	.item{
+		margin: 3px;
+		padding: 5px;
+	}
+	
+	.item > img{
+		width: 50px;
+		height: 50px;
+	}
+	
+	#wrap{
+		overflow: hidden;
+	}
+	
+	#wrap>div{
+		float: left;
+	}
+	
+	#dock{
+		position: fixed;
+		min-height: 120px;
+		width:100%;
+		bottom: 0px;
+		z-index: 1;
+	}
+	
+	#dock>div{
+		float: right;
+	}
+	
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	
+	$("#addCart").click(function(){
+		var cartList = $("#dock > .item");	//이 item은 그냥 정해준 이름???
+		$.each(cartList, function(idx, item){
+			var gno = $(item).attr("gno");
+			var qty = $(item).attr("qty");	//속성 만들기
+			var q = $(item).find("#qty").val();	//실제 입력한 값 받아오기
+			var g = {gno:gno, qty:q};	//속성에 입력한 값 넣어주기
+			
+			$.ajax("insertCart", {data:g, success:function(){
+				
+			}})
+		})
+	})
+	
+	//DB연동해서 goods테이블 정보 모두 가져오는 방법
+	//미리 써놓은 코드들을 getJSON안에 모두 넣기
+	$.getJSON("/goodsList",function(arr){
+		$.each(arr, function(idx, g){
+			var div = $("<div class='ui-widget-content ui-corner-all item'></div>").attr("gno", g.no);//attr 속성추가 - 담기 버튼을 위한 작업 
+			var img = $("<img/>").attr("src", "img/"+g.fname);	//fname -> fname.img
+			var name = $("<p></p>").html(g.item);
+			var price = $("<p></p>").html(g.price);
+			$(div).append(img, name, price);
+			$("#wrap").append(div);
+		})
+		
+		$("#wrap > div").draggable({	//위에 있는 애 = wrap //끌어내려오는 거
+			helper: "clone",
+			zIndex:100,		
+			scroll:false
+		});
+		
+		$("#dock").droppable({	//밑에 있는 애  = dock // 다시 끌어올리는 거 
+			accept: "#wrap > div",
+			drop:function(event, ui){
+				$(ui.draggable).fadeOut(function(){	//fadeOut: 점점 사라지게 해줘
+					$(this).appendTo("#dock").fadeIn();	//fadeIn() : 점점 나타나게 해줘
+					$('<input type="number" class="qty"/>').appendTo(this).fadeIn();	//this - wrap 하위에 있는 div
+				});
+			}
+			
+		});	//끌어다 놓는 게 가능하도록 해주세요
+		$("body").droppable({	//dock + wrap 전체
+			accept: "#dock > div",
+			drop:function(event, ui){
+				$(ui.draggable).fadeOut(function(){	//fadeOut: 점점 사라지게 해줘
+					$(this).appendTo("#wrap").fadeIn();	//fadeIn() : 점점 나타나게 해줘
+				});
+			}
+		});
+
+	})	
+	
+	
+	
+	
+})
+
+</script>
+</head>
+<body>
+	<div id="wrap"></div>
+	<button id="addCart">담기</button>
+	<div id="dock" class="ui-state-error"></div>
+</body>
+</html>
